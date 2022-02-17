@@ -3,3 +3,6 @@
 
 # Config
 /config/config.json
+
+# utils
+/utils/jwt.utils.js
