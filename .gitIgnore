@@ -5,4 +5,4 @@
 /config/config.json
 
 # utils
-/utils/jwt.utils.js
+utils/jwt.utils.js
