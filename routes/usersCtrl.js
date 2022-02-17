@@ -5,9 +5,6 @@ let asyncLib = require('async');
 let validator = require('../validators/validators');
 let models    = require('../models');
 
-const EMAIL_REGEX     = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-const PASSWORD_REGEX  = /^(?=.*\d).{4,8}$/;
-
 //Routes
 module.exports = {
     register: function(req, res) {
@@ -72,6 +69,48 @@ module.exports = {
       },
 
     login: function(req, res)  {
+        let email = req.body.email;
+        let password = req.body.password;
 
+        validator.connexionFieldsValidator(email, password);
+
+        asyncLib.waterfall([
+            function(done) {
+                models.User.findOne({
+                    where: {email: email }
+                })
+                .then(function(userFound) {
+                    done(null, userFound);
+                })
+                .catch(function(err) {
+                    return res.status(500).json({'error': 'unable to verify user'})
+                });
+            },
+            function(userFound, done) {
+                if(userFound) {
+                   bcrypt.compare(password, userFound.password, function(errBycrypt, resBycrypt) {
+                       done(null, userFound, resBycrypt)
+                   });
+                } else {
+                    return res.status(404).json({'error': 'user not exist in DB'})
+                }
+            },
+            function(userFound, resBycrypt, done) {
+               if(resBycrypt) {
+                   done(userFound);
+               } else {
+                   return res.status(403).json({'error': 'invalid password'})
+               }
+            }
+        ], function(userFound) {
+            if(userFound) {
+                return res.status(201).json({
+                    'userId': userFound.id,
+                    'token': jwtUtils.generateTokenForUser(userFound)
+                });
+            } else {
+                return res.status(500).json({'error': 'cannot log on user'})
+            }
+        });
     }
 }

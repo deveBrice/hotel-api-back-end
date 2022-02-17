@@ -26,6 +26,12 @@ module.exports = {
         if (!PASSWORD_REGEX.test(password)) {
             return res.status(400).json({ 'error': 'password invalid (must length 4 - 8 and include 1 number at least)' });
           }
+    },
+
+    connexionFieldsValidator: function(email, password) {
+        if (email == null ||  password == null) {
+            return res.status(400).json({ 'error': 'missing parameters' });
+          }
     }
 
 }
