@@ -71,7 +71,7 @@ module.exports = {
         });
       },
 
-    login: function(req, res) {
+    login: function(req, res)  {
 
     }
 }
