@@ -1,6 +1,7 @@
 let express = require('express');
 let bodyParser = require('body-parser');
 let apiRouter = require('./apiRouter').router;
+let cors = require('cors');
 
 let server = express();
 
@@ -11,6 +12,10 @@ server.get('/', function(req, res) {
    res.setHeader('Content-Type', 'text/html');
    res.status(200).send('<h1>Bienvenue sur le back office</h1>');
 });
+
+server.use(cors({
+    origin: ['http://localhost:4200']
+}));
 
 server.use('/api/', apiRouter)
 
